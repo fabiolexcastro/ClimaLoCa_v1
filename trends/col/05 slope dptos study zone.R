@@ -8,12 +8,12 @@ source('00 load libraries.R')
 get_clm <- function(zna, var){
   
   # zna <- zne.slp[1,]
-  # var <- 'bio_19'
+  # var <- 19
   
   nme <- zna$name
   cat(nme, '\n')
   
-  rst <- slp[[parse_number(var)]]
+  rst <- slp[[var]]
   rst <- raster::crop(rst, zna) %>% raster::mask(., zna)
   
   # Extract by mask - Cocoa zone
@@ -103,11 +103,11 @@ get_slp <- function(tbl){
            year = as.numeric(str_sub(year, 2, 5))) %>% 
     dplyr::select(-numero)
   
-  slp <- pull(dfm, 3) %>% 
+  sl <- pull(dfm, 3) %>% 
     ts() %>% 
     sens.slope() 
   
-  rsl <- data.frame(slope = slp$estimates, pvalue = slp$p.value, 
+  rsl <- data.frame(slope = sl$estimates, pvalue = sl$p.value, 
                     variable = unique(tbl$variable), zone = unique(tbl$mpio))
   
   
@@ -119,6 +119,8 @@ get_slp <- function(tbl){
   
   ggsave(plot = gpt, filename = glue('../png/graphs/climatogram/line_{unique(tbl$mpio)}_{unique(tbl$variable)}.png'), 
          units = 'in', width = 9, height = 7, dpi = 300)
+  
+  return(rsl)
   
 }
 
@@ -193,6 +195,6 @@ names(slp) <- glue('bio_{1:19}')
 # -------------------------------------------------------------------------
 
 # Arauca ------------------------------------------------------------------
-ara.b13 <- get_clm(zna = zne.slp[1,], var = 'bio_19')
-get_grp(tbl = ara.b13)
-get_slp(tbl = ara.b13)
+ara.b19 <- get_clm(zna = zne.slp[1,], var = 19)
+get_grp(tbl = ara.b19)
+ara.b19.slp <- get_slp(tbl = ara.b19)
